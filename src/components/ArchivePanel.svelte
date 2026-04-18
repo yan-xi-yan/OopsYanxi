@@ -9,6 +9,8 @@ export let tags: string[];
 export let categories: string[];
 export let sortedPosts: Post[] = [];
 
+let uncategorized: string | null = null;
+
 const params = new URLSearchParams(window.location.search);
 tags = params.has("tag") ? params.getAll("tag") : [];
 categories = params.has("category") ? params.getAll("category") : [];
@@ -42,6 +44,20 @@ function formatTag(tagList: string[]) {
 }
 
 onMount(async () => {
+    const params = new URLSearchParams(window.location.search);
+    tags = params.has("tag") ? params.getAll("tag") : [];
+    categories = params.has("category") ? params.getAll("category") : [];
+    uncategorized = params.get("uncategorized");
+
+    let filteredPosts: Post[] = sortedPosts;
+
+    if (tags.length > 0) {
+        filteredPosts = filteredPosts.filter(
+            (post) =>
+                Array.isArray(post.data.tags) &&
+                post.data.tags.some((tag) => tags.includes(tag)),
+        );
+    }
 	let filteredPosts: Post[] = sortedPosts;
 
 	if (tags.length > 0) {
