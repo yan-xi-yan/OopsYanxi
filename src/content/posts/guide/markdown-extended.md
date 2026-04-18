@@ -2,7 +2,7 @@
 title: Markdown 扩展功能
 published: 2024-05-01
 updated: 2024-11-29
-description: 进一步了解 Fuwari 中的 Markdown 扩展能力。
+description: 进一步了解 OopsYanxi 中的 Markdown 扩展能力。
 image: ''
 tags: [自定义]
 category: 指南
@@ -18,7 +18,7 @@ draft: true
 使用 `::github{repo="<owner>/<repo>"}` 这段代码即可创建 GitHub 仓库卡片。
 
 ```markdown
-::github{repo="saicaca/fuwari"}
+::github{repo="yan-xi-yan/OopsYanxi"}
 ```
 
 ## 提示块
@@ -93,4 +93,3 @@ draft: true
 ```markdown
 内容 :spoiler[被隐藏起来了 **ayyy**]！
 ```
-

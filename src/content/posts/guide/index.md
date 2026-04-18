@@ -1,5 +1,5 @@
 ---
-title: Fuwari 简明指南
+title: OopsYanxi 简明指南
 published: 2024-04-01
 description: 如何使用这个博客模板。
 image: "./cover.jpeg"
@@ -47,4 +47,3 @@ src/content/posts/
    |- cover.png
    |- index.md
 ```
-

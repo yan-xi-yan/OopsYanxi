@@ -1,7 +1,7 @@
 # About
-This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
+This is the demo site for [OopsYanxi](https://github.com/yan-xi-yan/OopsYanxi).
 
-::github{repo="saicaca/fuwari"}
+::github{repo="yan-xi-yan/OopsYanxi"}
 
 > ### Sources of images used in this site
 > - [Unsplash](https://unsplash.com/)
