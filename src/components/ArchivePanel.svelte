@@ -66,16 +66,18 @@
 	filteredPosts = filteredPosts.filter((post) => !post.data.category);
 	}
 
-	const grouped = filteredPosts.reduce(
-	(acc, post) => {
-	const year = post.data.published.getFullYear();
-	if (!acc[year]) {
-	acc[year] = [];
-	}
-	acc[year].push(post);
-	return acc;
-	},
-	{} as Record<number, Post=""[]>,
+	const initialGrouped: Record<number, Post=""[]> = {};
+    
+    const grouped = filteredPosts.reduce(
+        (acc, post) => {
+            const year = post.data.published.getFullYear();
+            if (!acc[year]) {
+                acc[year] = [];
+            }
+            acc[year].push(post);
+            return acc;
+        },
+        initialGrouped
     );
 
     const groupedPostsArray = Object.keys(grouped).map((yearStr) => ({
