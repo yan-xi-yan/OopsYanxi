@@ -1,103 +1,91 @@
 <script lang="ts">
-import { onMount } from "svelte";
+	import { onMount } from "svelte";
 
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
-import { getPostUrlBySlug } from "../utils/url-utils";
+	import I18nKey from "../i18n/i18nKey";
+	import { i18n } from "../i18n/translation";
+	import { getPostUrlBySlug } from "../utils/url-utils";
 
-export let tags: string[];
-export let categories: string[];
-export let sortedPosts: Post[] = [];
+	export let tags: string[] = [];
+	export let categories: string[] = [];
+	export let sortedPosts: Post[] = [];
 
-let uncategorized: string | null = null;
+	// 声明变量，但不赋予 window 相关的初始值
+	let uncategorized: string | null = null;
 
-const params = new URLSearchParams(window.location.search);
-tags = params.has("tag") ? params.getAll("tag") : [];
-categories = params.has("category") ? params.getAll("category") : [];
-const uncategorized = params.get("uncategorized");
-
-interface Post {
+	interface Post {
 	slug: string;
 	data: {
-		title: string;
-		tags: string[];
-		category?: string;
-		published: Date;
+	title: string;
+	tags: string[];
+	category?: string;
+	published: Date;
 	};
-}
+	}
 
-interface Group {
+	interface Group {
 	year: number;
 	posts: Post[];
-}
+	}
 
-let groups: Group[] = [];
+	let groups: Group[] = [];
 
-function formatDate(date: Date) {
+	function formatDate(date: Date) {
 	const month = (date.getMonth() + 1).toString().padStart(2, "0");
 	const day = date.getDate().toString().padStart(2, "0");
 	return `${month}-${day}`;
-}
+	}
 
-function formatTag(tagList: string[]) {
+	function formatTag(tagList: string[]) {
 	return tagList.map((t) => `#${t}`).join(" ");
-}
+	}
 
-onMount(async () => {
-    const params = new URLSearchParams(window.location.search);
-    tags = params.has("tag") ? params.getAll("tag") : [];
-    categories = params.has("category") ? params.getAll("category") : [];
-    uncategorized = params.get("uncategorized");
+	onMount(async () => {
+	// 所有的浏览器 API (window) 操作都必须放在 onMount 里面
+	const params = new URLSearchParams(window.location.search);
+	tags = params.has("tag") ? params.getAll("tag") : [];
+	categories = params.has("category") ? params.getAll("category") : [];
+	uncategorized = params.get("uncategorized");
 
-    let filteredPosts: Post[] = sortedPosts;
-
-    if (tags.length > 0) {
-        filteredPosts = filteredPosts.filter(
-            (post) =>
-                Array.isArray(post.data.tags) &&
-                post.data.tags.some((tag) => tags.includes(tag)),
-        );
-    }
 	let filteredPosts: Post[] = sortedPosts;
 
 	if (tags.length > 0) {
-		filteredPosts = filteredPosts.filter(
-			(post) =>
-				Array.isArray(post.data.tags) &&
-				post.data.tags.some((tag) => tags.includes(tag)),
-		);
+	filteredPosts = filteredPosts.filter(
+	(post) =>
+	Array.isArray(post.data.tags) &&
+	post.data.tags.some((tag) => tags.includes(tag)),
+	);
 	}
 
 	if (categories.length > 0) {
-		filteredPosts = filteredPosts.filter(
-			(post) => post.data.category && categories.includes(post.data.category),
-		);
+	filteredPosts = filteredPosts.filter(
+	(post) => post.data.category && categories.includes(post.data.category),
+	);
 	}
 
 	if (uncategorized) {
-		filteredPosts = filteredPosts.filter((post) => !post.data.category);
+	filteredPosts = filteredPosts.filter((post) => !post.data.category);
 	}
 
 	const grouped = filteredPosts.reduce(
-		(acc, post) => {
-			const year = post.data.published.getFullYear();
-			if (!acc[year]) {
-				acc[year] = [];
-			}
-			acc[year].push(post);
-			return acc;
-		},
-		{} as Record<number, Post[]>,
-	);
+	(acc, post) => {
+	const year = post.data.published.getFullYear();
+	if (!acc[year]) {
+	acc[year] = [];
+	}
+	acc[year].push(post);
+	return acc;
+	},
+	{} as Record<number, Post=""[]>,
+    );
 
-	const groupedPostsArray = Object.keys(grouped).map((yearStr) => ({
-		year: Number.parseInt(yearStr, 10),
-		posts: grouped[Number.parseInt(yearStr, 10)],
-	}));
+    const groupedPostsArray = Object.keys(grouped).map((yearStr) => ({
+        year: Number.parseInt(yearStr, 10),
+        posts: grouped[Number.parseInt(yearStr, 10)],
+    }));
 
-	groupedPostsArray.sort((a, b) => b.year - a.year);
+    groupedPostsArray.sort((a, b) => b.year - a.year);
 
-	groups = groupedPostsArray;
+    groups = groupedPostsArray;
 });
 </script>
 
