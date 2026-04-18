@@ -66,8 +66,8 @@
 	filteredPosts = filteredPosts.filter((post) => !post.data.category);
 	}
 
-	const initialGrouped: Record<number, Post=""[]> = {};
-    
+	const initialGrouped: { [year: number]: Post[] } = {};
+	
     const grouped = filteredPosts.reduce(
         (acc, post) => {
             const year = post.data.published.getFullYear();
