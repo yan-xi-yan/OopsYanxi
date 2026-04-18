@@ -99,7 +99,10 @@ export default defineConfig({
 				showCopyToClipboardButton: false,
 			}
 		}),
-        svelte(),
+        svelte({
+			// 强制 Svelte 编译器忽略 Astro 生成的虚拟代理文件
+			exclude: ['astro-entry:**', '\0astro-entry:**'] 
+		}),
 		sitemap(),
 	],
 	markdown: {
