@@ -4,8 +4,8 @@ published: 2024-05-01
 updated: 2024-11-29
 description: 进一步了解 Fuwari 中的 Markdown 扩展能力。
 image: ''
-tags: [演示, 示例, Markdown, Fuwari]
-category: 示例
+tags: [自定义]
+category: 指南
 draft: true
 ---
 

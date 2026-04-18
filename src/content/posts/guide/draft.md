@@ -1,8 +1,8 @@
 ---
 title: 草稿示例
 published: 2022-07-01
-tags: [Markdown, 博客, 演示]
-category: 示例
+tags: ["自定义"]
+category: 指南
 draft: true
 ---
 
