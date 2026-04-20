@@ -6,6 +6,11 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
+import {
+	buildMarkdownLinkMap,
+	normalizeContentFilePath,
+	rewriteInternalMarkdownLinks,
+} from "@utils/markdown-link-utils";
 import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
@@ -16,16 +21,25 @@ import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 
 export async function getStaticPaths() {
 	const blogEntries = await getSortedPosts();
+	const markdownLinkMap = buildMarkdownLinkMap(blogEntries);
 	return blogEntries.map((entry) => ({
 		params: { slug: entry.slug },
-		props: { entry },
+		props: { entry, markdownLinkMap },
 	}));
 }
 
-const { entry } = Astro.props;
+const { entry, markdownLinkMap } = Astro.props;
 const { Content, headings } = await entry.render();
 
 const { remarkPluginFrontmatter } = await entry.render();
+const markdownSourcePath = entry.filePath ? normalizeContentFilePath(entry.filePath) : null;
+const renderedMarkdownHtml = entry.rendered?.html
+	? rewriteInternalMarkdownLinks(
+			entry.rendered.html,
+			markdownSourcePath,
+			markdownLinkMap,
+		)
+	: null;
 
 const jsonLd = {
 	"@context": "https://schema.org",
@@ -102,8 +116,13 @@ const jsonLd = {
             }
 
 
-            <Markdown class="mb-6 markdown-content onload-animation">
-                <Content />
+            <Markdown
+                class="mb-6 markdown-content onload-animation"
+                html={renderedMarkdownHtml}
+                sourcePath={markdownSourcePath}
+                internalMarkdownLinks={markdownLinkMap}
+            >
+                {!renderedMarkdownHtml && <Content />}
             </Markdown>
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}

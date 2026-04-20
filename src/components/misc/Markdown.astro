@@ -4,16 +4,82 @@ import "@fontsource-variable/jetbrains-mono/wght-italic.css";
 
 interface Props {
 	class: string;
+	html?: string | null;
+	sourcePath?: string | null;
+	internalMarkdownLinks?: Record<string, string>;
 }
-const className = Astro.props.class;
+const {
+	class: className,
+	html = null,
+	sourcePath = null,
+	internalMarkdownLinks = {},
+} = Astro.props;
 ---
-<div data-pagefind-body class={`prose dark:prose-invert prose-base !max-w-none custom-md ${className}`}>
-    <!--<div class="prose dark:prose-invert max-w-none custom-md">-->
-    <!--<div class="max-w-none custom-md">-->
-    <slot/>
+<div
+    data-pagefind-body
+    data-source-path={sourcePath ?? undefined}
+    data-internal-markdown-links={JSON.stringify(internalMarkdownLinks)}
+    class={`prose dark:prose-invert prose-base !max-w-none custom-md ${className}`}
+>
+    {html ? <Fragment set:html={html} /> : <slot/>}
 </div>
 
 <script>
+function resolveInternalMarkdownHref(
+    href: string,
+    sourcePath: string,
+    linkMap: Record<string, string>,
+) {
+    if (!/\.md(?:$|[?#])/i.test(href) || /^(?:[a-z][a-z\d+\-.]*:|\/\/|#)/i.test(href)) {
+        return null;
+    }
+
+    const sourceDir = sourcePath.slice(0, sourcePath.lastIndexOf("/") + 1);
+    const resolvedUrl = new URL(href, `https://md.local/${sourceDir}`);
+    const resolvedPath = decodeURIComponent(resolvedUrl.pathname)
+        .replace(/^\/+/, "")
+        .replaceAll("\\", "/");
+    const targetUrl = linkMap[resolvedPath];
+
+    if (!targetUrl) {
+        return null;
+    }
+
+    return `${targetUrl}${resolvedUrl.search}${resolvedUrl.hash}`;
+}
+
+function rewriteInternalMarkdownLinks() {
+    document.querySelectorAll<HTMLElement>(".custom-md[data-source-path]").forEach((container) => {
+        const sourcePath = container.dataset.sourcePath;
+        const linkMapData = container.dataset.internalMarkdownLinks;
+        if (!sourcePath || !linkMapData) return;
+
+        let linkMap: Record<string, string> = {};
+        try {
+            linkMap = JSON.parse(linkMapData);
+        } catch {
+            return;
+        }
+
+        container.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((anchor) => {
+            const rawHref = anchor.getAttribute("href");
+            if (!rawHref) return;
+
+            const resolvedHref = resolveInternalMarkdownHref(rawHref, sourcePath, linkMap);
+            if (resolvedHref) {
+                anchor.setAttribute("href", resolvedHref);
+            }
+        });
+    });
+}
+
+if (!(window as Window & { __oopsYanxiMarkdownLinksBound?: boolean }).__oopsYanxiMarkdownLinksBound) {
+    document.addEventListener("astro:page-load", rewriteInternalMarkdownLinks);
+    (window as Window & { __oopsYanxiMarkdownLinksBound?: boolean }).__oopsYanxiMarkdownLinksBound = true;
+}
+
+rewriteInternalMarkdownLinks();
+
 document.addEventListener("click", function (e: MouseEvent) {
     const target = e.target as Element | null;
     if (target && target.classList.contains("copy-btn")) {
