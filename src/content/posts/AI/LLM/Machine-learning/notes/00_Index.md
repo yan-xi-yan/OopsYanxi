@@ -9,7 +9,7 @@ tags:
 category: Machine Learning
 draft: false
 ---
-	
+
 # 机器学习知识库
 
 ## 目录结构
@@ -23,7 +23,8 @@ draft: false
 
 ### 03 - 模型训练
 - [梯度下降法与模型训练](./03_Model_Training/01_梯度下降法与模型训练.md)
-- [升维、降维与 Early Stopping](./03_Model_Training/02_升维降维与Early_Stopping.md)
+- [升维、降维、惩罚项与 Early Stopping](./03_Model_Training/02_升维降维与Early_Stopping.md)
+- [ML 训练流水线与算法流派](./03_Model_Training/03_ML训练流水线与算法流派.md)
 
 ### 04 - 正则化
 - [正则化与归一化](./04_Regularization/01_正则化与归一化.md)
