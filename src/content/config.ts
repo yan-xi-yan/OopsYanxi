@@ -9,8 +9,12 @@ const postsCollection = defineCollection({
 		description: z.string().optional().default(""),
 		image: z.string().optional().default(""),
 		tags: z.array(z.string()).optional().default([]),
-		category: z.string().optional().nullable().default(""),
+		category: z.string().optional().default(""),
 		lang: z.string().optional().default(""),
+		series: z.string().optional().default(""),
+		section: z.string().optional().default(""),
+		kind: z.string().optional().default(""),
+		order: z.number().int().optional().default(0),
 
 		/* For internal use */
 		prevTitle: z.string().default(""),

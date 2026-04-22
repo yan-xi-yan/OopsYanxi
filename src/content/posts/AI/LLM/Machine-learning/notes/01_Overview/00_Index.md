@@ -3,6 +3,12 @@ title: 概览
 published: 2026-04-20
 description: 机器学习与深度学习的全局认识
 tags: [机器学习, 深度学习, 索引]
+category: Machine Learning
+draft: false
+series: Machine Learning
+section: 概览
+kind: index
+order: 1
 ---
 
 # 01 - 概览

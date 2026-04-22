@@ -3,6 +3,12 @@ title: 注意力与 Transformer
 published: 2026-04-21
 description: Seq2Seq、注意力机制与 Transformer 架构
 tags: [深度学习, Attention, Transformer, 索引]
+category: Deep Learning
+draft: false
+series: Machine Learning
+section: 注意力与 Transformer
+kind: index
+order: 10
 ---
 
 # 10 - 注意力与 Transformer

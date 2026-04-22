@@ -15,13 +15,13 @@ draft: false
 
 ```mermaid
 graph TD
-    PE["① PositionalEncoding"] --> TE["② TokenEmbedding"]
-    TE --> MHA["③ MultiHeadAttention"]
-    MHA --> FFN["④ FeedForward"]
-    FFN --> EB["⑤ EncoderBlock"]
-    EB --> DB["⑥ DecoderBlock"]
-    DB --> TF["⑦ Transformer"]
-    TF --> Train["⑧ 训练循环"]
+    PE["PositionalEncoding"] --> TE["TokenEmbedding"]
+    TE --> MHA["MultiHeadAttention"]
+    MHA --> FFN["FeedForward"]
+    FFN --> EB["EncoderBlock"]
+    EB --> DB["DecoderBlock"]
+    DB --> TF["Transformer"]
+    TF --> Train["训练循环"]
 ```
 
 ---

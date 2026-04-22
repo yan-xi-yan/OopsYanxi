@@ -3,7 +3,7 @@ title: Markdown 示例
 published: 2023-10-01
 description: 一篇简单的 Markdown 博客文章示例。
 tags: ["自定义"]
-category: 指南
+category: Guide
 draft: true
 ---
 

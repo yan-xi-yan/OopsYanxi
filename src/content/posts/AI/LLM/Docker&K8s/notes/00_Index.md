@@ -8,6 +8,10 @@ tags:
   - 索引
 category: Docker & K8s
 draft: false
+series: Docker & K8s
+section: Docker & K8s 知识库索引
+kind: index
+order: 0
 ---
 
 # Docker & K8s 知识库

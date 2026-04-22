@@ -2,7 +2,7 @@
 title: git 命令
 published: 2026-04-18
 tags: [自定义]
-category: 示例
+category: Example
 draft: true
 ---
 

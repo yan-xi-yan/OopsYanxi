@@ -5,6 +5,10 @@ description: Transformer 架构深度拆解系列总目录
 tags: [Transformer, 深度学习, 索引]
 category: Transformer
 draft: false
+series: Transformer
+section: Transformer 知识库索引
+kind: index
+order: 0
 ---
 
 # Transformer 深度拆解

@@ -7,6 +7,10 @@ tags:
   - 索引
 category: Python
 draft: false
+series: Python
+section: Python 知识库索引
+kind: index
+order: 0
 ---
 
 # Python 知识库

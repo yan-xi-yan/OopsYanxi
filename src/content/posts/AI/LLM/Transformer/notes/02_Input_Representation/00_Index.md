@@ -3,6 +3,12 @@ title: 输入表示
 published: 2026-04-22
 description: Token Embedding 与位置编码
 tags: [Transformer, Embedding, 位置编码, 索引]
+category: Transformer
+draft: false
+series: Transformer
+section: 输入表示
+kind: index
+order: 2
 ---
 
 # 02 - 输入表示

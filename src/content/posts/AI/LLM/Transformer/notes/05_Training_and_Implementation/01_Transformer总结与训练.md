@@ -15,21 +15,21 @@ draft: false
 
 ```mermaid
 graph TD
-    subgraph 输入管线
+    subgraph InputPipeline["输入管线"]
         A1["原始文本"] --> A2["分词 Tokenizer"]
         A2 --> A3["Token ID 序列"]
         A3 --> A4["Embedding 查表<br/>× √d_model"]
         A4 --> A5["+ 位置编码"]
     end
 
-    subgraph 编码器 ×N
+    subgraph EncoderStack["编码器 × N"]
         A5 --> E1["Multi-Head Self-Attention"]
         E1 --> E2["Add & LayerNorm"]
         E2 --> E3["FFN"]
         E3 --> E4["Add & LayerNorm"]
     end
 
-    subgraph 解码器 ×N
+    subgraph DecoderStack["解码器 × N"]
         E4 -->|"K, V"| D2
         D0["目标序列（右移）"] --> D0a["Embedding + 位置编码"]
         D0a --> D1["Masked Self-Attention"]
@@ -104,7 +104,7 @@ $$lr = d_{model}^{-0.5} \cdot \min(step^{-0.5},\; step \cdot warmup\_steps^{-1.5
 
 ```mermaid
 graph LR
-    subgraph 学习率变化曲线
+    subgraph Schedule["学习率变化曲线"]
         W["Warmup 阶段<br/>线性增长<br/>0→4000步"] --> P["峰值"]
         P --> D["Decay 阶段<br/>平方根衰减"]
     end

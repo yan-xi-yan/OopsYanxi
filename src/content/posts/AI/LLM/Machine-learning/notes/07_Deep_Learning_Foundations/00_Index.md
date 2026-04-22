@@ -3,6 +3,12 @@ title: 深度学习基础
 published: 2026-04-21
 description: 梯度消失、激活函数与参数初始化
 tags: [深度学习, 梯度消失, 激活函数, 索引]
+category: Deep Learning
+draft: false
+series: Machine Learning
+section: 深度学习基础
+kind: index
+order: 7
 ---
 
 # 07 - 深度学习基础

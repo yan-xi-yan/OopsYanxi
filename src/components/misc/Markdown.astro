@@ -8,6 +8,7 @@ interface Props {
 	sourcePath?: string | null;
 	internalMarkdownLinks?: Record<string, string>;
 }
+
 const {
 	class: className,
 	html = null,
@@ -16,183 +17,240 @@ const {
 } = Astro.props;
 ---
 <div
-    data-pagefind-body
-    data-source-path={sourcePath ?? undefined}
-    data-internal-markdown-links={JSON.stringify(internalMarkdownLinks)}
-    class={`prose dark:prose-invert prose-base !max-w-none custom-md ${className}`}
+	data-pagefind-body
+	data-source-path={sourcePath ?? undefined}
+	data-internal-markdown-links={JSON.stringify(internalMarkdownLinks)}
+	class={`prose dark:prose-invert prose-base !max-w-none custom-md ${className}`}
 >
-    {html ? <Fragment set:html={html} /> : <slot/>}
+	{html ? <Fragment set:html={html} /> : <slot />}
 </div>
 
 <script>
 type MermaidRenderResult = {
-    svg: string;
-    bindFunctions?: (element: Element) => void;
+	svg: string;
+	bindFunctions?: (element: Element) => void;
 };
 
 type MermaidModule = {
-    initialize: (config: Record<string, unknown>) => void;
-    render: (id: string, source: string) => Promise<MermaidRenderResult>;
+	initialize: (config: Record<string, unknown>) => void;
+	render: (id: string, source: string) => Promise<MermaidRenderResult>;
 };
 
 declare global {
-    interface Window {
-        __oopsYanxiMarkdownLinksBound?: boolean;
-        __oopsYanxiMermaidBound?: boolean;
-    }
+	interface Window {
+		__oopsYanxiMarkdownLinksBound?: boolean;
+		__oopsYanxiMermaidBound?: boolean;
+	}
 }
 
 let mermaidModulePromise: Promise<MermaidModule> | null = null;
 
 function resolveInternalMarkdownHref(
-    href: string,
-    sourcePath: string,
-    linkMap: Record<string, string>,
+	href: string,
+	sourcePath: string,
+	linkMap: Record<string, string>,
 ) {
-    if (!/\.md(?:$|[?#])/i.test(href) || /^(?:[a-z][a-z\d+\-.]*:|\/\/|#)/i.test(href)) {
-        return null;
-    }
+	if (!/\.md(?:$|[?#])/i.test(href) || /^(?:[a-z][a-z\d+\-.]*:|\/\/|#)/i.test(href)) {
+		return null;
+	}
 
-    const sourceDir = sourcePath.slice(0, sourcePath.lastIndexOf("/") + 1);
-    const resolvedUrl = new URL(href, `https://md.local/${sourceDir}`);
-    const resolvedPath = decodeURIComponent(resolvedUrl.pathname)
-        .replace(/^\/+/, "")
-        .replaceAll("\\", "/");
-    const targetUrl = linkMap[resolvedPath];
+	const sourceDir = sourcePath.slice(0, sourcePath.lastIndexOf("/") + 1);
+	const resolvedUrl = new URL(href, `https://md.local/${sourceDir}`);
+	const resolvedPath = decodeURIComponent(resolvedUrl.pathname)
+		.replace(/^\/+/, "")
+		.replaceAll("\\", "/");
+	const targetUrl = linkMap[resolvedPath];
 
-    if (!targetUrl) {
-        return null;
-    }
+	if (!targetUrl) {
+		return null;
+	}
 
-    return `${targetUrl}${resolvedUrl.search}${resolvedUrl.hash}`;
+	return `${targetUrl}${resolvedUrl.search}${resolvedUrl.hash}`;
 }
 
 function rewriteInternalMarkdownLinks() {
-    document.querySelectorAll<HTMLElement>(".custom-md[data-source-path]").forEach((container) => {
-        const sourcePath = container.dataset.sourcePath;
-        const linkMapData = container.dataset.internalMarkdownLinks;
-        if (!sourcePath || !linkMapData) return;
+	document.querySelectorAll<HTMLElement>(".custom-md[data-source-path]").forEach((container) => {
+		const sourcePath = container.dataset.sourcePath;
+		const linkMapData = container.dataset.internalMarkdownLinks;
+		if (!sourcePath || !linkMapData) return;
 
-        let linkMap: Record<string, string> = {};
-        try {
-            linkMap = JSON.parse(linkMapData);
-        } catch {
-            return;
-        }
+		let linkMap: Record<string, string> = {};
+		try {
+			linkMap = JSON.parse(linkMapData);
+		} catch {
+			return;
+		}
 
-        container.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((anchor) => {
-            const rawHref = anchor.getAttribute("href");
-            if (!rawHref) return;
+		container.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((anchor) => {
+			const rawHref = anchor.getAttribute("href");
+			if (!rawHref) return;
 
-            const resolvedHref = resolveInternalMarkdownHref(rawHref, sourcePath, linkMap);
-            if (resolvedHref) {
-                anchor.setAttribute("href", resolvedHref);
-            }
-        });
-    });
+			const resolvedHref = resolveInternalMarkdownHref(rawHref, sourcePath, linkMap);
+			if (resolvedHref) {
+				anchor.setAttribute("href", resolvedHref);
+			}
+		});
+	});
 }
 
-function extractMermaidSource(pre: HTMLPreElement) {
-    const renderedLines = Array.from(
-        pre.querySelectorAll<HTMLElement>(":scope > code > .ec-line > .code"),
-    );
+function decorateMermaidSvg(container: HTMLElement) {
+	const svg = container.querySelector<SVGSVGElement>("svg");
+	if (!svg) {
+		return;
+	}
 
-    if (renderedLines.length > 0) {
-        return renderedLines
-            .map((line) => line.textContent ?? "")
-            .join("\n")
-            .trim();
-    }
+	const viewBox = svg.getAttribute("viewBox");
+	if (viewBox) {
+		const [, , rawWidth] = viewBox.split(/[\s,]+/);
+		const width = Number.parseFloat(rawWidth);
+		if (Number.isFinite(width) && width > 0) {
+			svg.style.width = `${Math.ceil(width)}px`;
+			svg.style.minWidth = `${Math.ceil(width)}px`;
+		}
+	}
 
-    return (pre.textContent ?? "").trim();
+	svg.style.maxWidth = "none";
+	svg.style.height = "auto";
+	svg.style.display = "block";
 }
 
 async function getMermaidRenderer() {
-    if (!mermaidModulePromise) {
-        mermaidModulePromise = import("mermaid").then((mermaidModule) => {
-            return (mermaidModule.default ?? mermaidModule) as MermaidModule;
-        });
-    }
+	if (!mermaidModulePromise) {
+		mermaidModulePromise = import("mermaid").then((mermaidModule) => {
+			return (mermaidModule.default ?? mermaidModule) as MermaidModule;
+		});
+	}
 
-    return mermaidModulePromise;
+	return mermaidModulePromise;
 }
 
 async function renderMermaidDiagrams() {
-    const mermaidBlocks = Array.from(
-        document.querySelectorAll<HTMLPreElement>(".custom-md pre[data-language='mermaid']"),
-    );
-    if (mermaidBlocks.length === 0) {
-        return;
-    }
+	const mermaidBlocks = Array.from(
+		document.querySelectorAll<HTMLElement>(".custom-md .mermaid-diagram[data-mermaid-source]"),
+	);
+	if (mermaidBlocks.length === 0) {
+		return;
+	}
 
-    const mermaid = await getMermaidRenderer();
-    mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: "loose",
-        theme: document.documentElement.classList.contains("dark") ? "dark" : "default",
-    });
+	const mermaid = await getMermaidRenderer();
+	mermaid.initialize({
+		startOnLoad: false,
+		securityLevel: "loose",
+		theme: document.documentElement.classList.contains("dark") ? "dark" : "default",
+	});
 
-    for (const pre of mermaidBlocks) {
-        const source = extractMermaidSource(pre);
-        if (!source) {
-            continue;
-        }
+	for (const container of mermaidBlocks) {
+		if (container.dataset.mermaidState) {
+			continue;
+		}
 
-        const wrapper = pre.closest(".expressive-code") ?? pre;
-        const diagramContainer = document.createElement("div");
-        const diagramId = `mermaid-diagram-${Math.random().toString(36).slice(2)}`;
+		const source = container.dataset.mermaidSource?.trim();
+		const diagramCanvas = container.querySelector<HTMLElement>(".mermaid-diagram__canvas");
+		if (!source) {
+			continue;
+		}
 
-        diagramContainer.className = "mermaid-diagram not-prose my-6 overflow-x-auto rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[0.03]";
-        diagramContainer.dataset.mermaidSource = source;
+		if (!diagramCanvas) {
+			continue;
+		}
 
-        try {
-            const { svg, bindFunctions } = await mermaid.render(diagramId, source);
-            diagramContainer.innerHTML = svg;
-            bindFunctions?.(diagramContainer);
-            wrapper.replaceWith(diagramContainer);
-        } catch (error) {
-            console.error("Failed to render mermaid diagram", error);
-        }
-    }
+		const diagramId = `mermaid-diagram-${Math.random().toString(36).slice(2)}`;
+		container.dataset.mermaidState = "rendering";
+
+		try {
+			const { svg, bindFunctions } = await mermaid.render(diagramId, source);
+			diagramCanvas.innerHTML = svg;
+			decorateMermaidSvg(diagramCanvas);
+			bindFunctions?.(diagramCanvas);
+
+			container.dataset.mermaidState = "rendered";
+		} catch (error) {
+			console.error("Failed to render mermaid diagram", error);
+			const errorBlock = document.createElement("pre");
+			errorBlock.className = "mermaid-diagram__error";
+			errorBlock.textContent = `Mermaid 渲染失败\n${error instanceof Error ? error.message : String(error)}`;
+			diagramCanvas.replaceChildren(errorBlock);
+			container.dataset.mermaidState = "error";
+		}
+	}
 }
 
 if (!window.__oopsYanxiMarkdownLinksBound) {
-    document.addEventListener("astro:page-load", rewriteInternalMarkdownLinks);
-    window.__oopsYanxiMarkdownLinksBound = true;
+	document.addEventListener("astro:page-load", rewriteInternalMarkdownLinks);
+	window.__oopsYanxiMarkdownLinksBound = true;
 }
 
 rewriteInternalMarkdownLinks();
 renderMermaidDiagrams();
 
 if (!window.__oopsYanxiMermaidBound) {
-    document.addEventListener("astro:page-load", renderMermaidDiagrams);
-    window.__oopsYanxiMermaidBound = true;
+	document.addEventListener("astro:page-load", renderMermaidDiagrams);
+	window.__oopsYanxiMermaidBound = true;
 }
 
 document.addEventListener("click", function (e: MouseEvent) {
-    const target = e.target as Element | null;
-    if (target && target.classList.contains("copy-btn")) {
-        const preEle = target.closest("pre");
-        const codeEle = preEle?.querySelector("code");
-        const code = Array.from(codeEle?.querySelectorAll(".code:not(summary *)") ?? [])
-            .map(el => el.textContent)
-            .map(t => t === "\n" ? "" : t)
-            .join("\n");
-        navigator.clipboard.writeText(code);
+	const target = e.target as Element | null;
+	if (target && target.classList.contains("copy-btn")) {
+		const preEle = target.closest("pre");
+		const codeEle = preEle?.querySelector("code");
+		const code = Array.from(codeEle?.querySelectorAll(".code:not(summary *)") ?? [])
+			.map((el) => el.textContent)
+			.map((text) => (text === "\n" ? "" : text))
+			.join("\n");
+		navigator.clipboard.writeText(code);
 
-        const timeoutId = target.getAttribute("data-timeout-id");
-        if (timeoutId) {
-            clearTimeout(parseInt(timeoutId));
-        }
+		const timeoutId = target.getAttribute("data-timeout-id");
+		if (timeoutId) {
+			clearTimeout(Number.parseInt(timeoutId, 10));
+		}
 
-        target.classList.add("success");
+		target.classList.add("success");
 
-        // 设置新的timeout并保存ID到按钮的自定义属性中
-        const newTimeoutId = setTimeout(() => {
-            target.classList.remove("success");
-        }, 1000);
+		const newTimeoutId = window.setTimeout(() => {
+			target.classList.remove("success");
+		}, 1000);
 
-        target.setAttribute("data-timeout-id", newTimeoutId.toString());
-    }
+		target.setAttribute("data-timeout-id", newTimeoutId.toString());
+	}
 });
 </script>
+
+<style is:global>
+.custom-md .mermaid-diagram {
+	width: 100%;
+	margin: 1.5rem 0;
+	border: 1px solid var(--line-divider);
+	border-radius: 1rem;
+	background: var(--license-block-bg);
+	overflow: hidden;
+}
+
+.custom-md .mermaid-diagram__viewport {
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding: 1rem 1rem 1.25rem;
+}
+
+.custom-md .mermaid-diagram__canvas {
+	width: max-content;
+	min-width: 100%;
+	padding: 0.25rem 0 0.5rem;
+}
+
+.custom-md .mermaid-diagram__canvas > svg {
+	display: block;
+}
+
+.custom-md .mermaid-diagram__error {
+	margin: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-size: 0.875rem;
+	line-height: 1.6;
+	color: rgb(185 28 28);
+}
+
+.dark .custom-md .mermaid-diagram__error {
+	color: rgb(252 165 165);
+}
+</style>

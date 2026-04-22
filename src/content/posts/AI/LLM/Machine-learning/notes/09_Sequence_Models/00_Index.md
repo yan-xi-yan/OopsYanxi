@@ -3,6 +3,12 @@ title: 序列模型
 published: 2026-04-21
 description: RNN、LSTM 与序列建模
 tags: [深度学习, RNN, LSTM, 序列模型, 索引]
+category: Deep Learning
+draft: false
+series: Machine Learning
+section: 序列模型
+kind: index
+order: 9
 ---
 
 # 09 - 序列模型

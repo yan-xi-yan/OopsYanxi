@@ -3,6 +3,12 @@ title: 注意力机制
 published: 2026-04-22
 description: Self Attention 从直觉到数学推导再到多头扩展
 tags: [Transformer, Self Attention, 多头注意力, 索引]
+category: Transformer
+draft: false
+series: Transformer
+section: 注意力机制
+kind: index
+order: 3
 ---
 
 # 03 - 注意力机制

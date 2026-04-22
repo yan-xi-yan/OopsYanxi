@@ -3,6 +3,12 @@ title: 卷积神经网络
 published: 2026-04-21
 description: CNN 原理、经典模型与实例解析
 tags: [深度学习, CNN, 计算机视觉, 索引]
+category: Deep Learning
+draft: false
+series: Machine Learning
+section: 卷积神经网络
+kind: index
+order: 8
 ---
 
 # 08 - 卷积神经网络

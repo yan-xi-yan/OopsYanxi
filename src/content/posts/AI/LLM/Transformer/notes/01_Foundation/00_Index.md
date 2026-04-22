@@ -3,6 +3,12 @@ title: 基础与全局
 published: 2026-04-22
 description: 语言模型背景与 Transformer 整体架构
 tags: [Transformer, 语言模型, 索引]
+category: Transformer
+draft: false
+series: Transformer
+section: 基础与全局
+kind: index
+order: 1
 ---
 
 # 01 - 基础与全局

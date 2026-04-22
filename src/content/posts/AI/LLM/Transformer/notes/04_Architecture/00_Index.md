@@ -3,6 +3,12 @@ title: 架构组件
 published: 2026-04-22
 description: Encoder Block、Decoder 掩码与输出层
 tags: [Transformer, Encoder, Decoder, 索引]
+category: Transformer
+draft: false
+series: Transformer
+section: 架构组件
+kind: index
+order: 4
 ---
 
 # 04 - 架构组件

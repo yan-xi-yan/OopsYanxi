@@ -3,6 +3,12 @@ title: 神经网络
 published: 2026-04-20
 description: 神经网络结构、前向传播与反向传播
 tags: [机器学习, 神经网络, 索引]
+category: Machine Learning
+draft: false
+series: Machine Learning
+section: 神经网络
+kind: index
+order: 6
 ---
 
 # 06 - 神经网络

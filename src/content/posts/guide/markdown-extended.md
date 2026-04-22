@@ -5,7 +5,7 @@ updated: 2024-11-29
 description: 进一步了解 OopsYanxi 中的 Markdown 扩展能力。
 image: ''
 tags: [自定义]
-category: 指南
+category: Guide
 draft: true
 ---
 

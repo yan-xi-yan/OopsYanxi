@@ -3,6 +3,12 @@ title: 有监督学习
 published: 2026-04-20
 description: 回归与分类的核心模型
 tags: [机器学习, 有监督学习, 索引]
+category: Machine Learning
+draft: false
+series: Machine Learning
+section: 有监督学习
+kind: index
+order: 2
 ---
 
 # 02 - 有监督学习

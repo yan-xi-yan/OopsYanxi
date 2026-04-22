@@ -2,7 +2,7 @@
 title: 草稿示例
 published: 2022-07-01
 tags: ["自定义"]
-category: 指南
+category: Guide
 draft: true
 ---
 

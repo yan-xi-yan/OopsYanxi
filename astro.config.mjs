@@ -19,13 +19,19 @@ import { expressiveCodeConfig } from "./src/config.ts";
 import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badge.ts";
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
+import { MermaidComponent } from "./src/plugins/rehype-component-mermaid.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
+import { remarkMermaidDirective } from "./src/plugins/remark-mermaid-directive.mjs";
+import { remarkNormalizeCodeFences } from "./src/plugins/remark-normalize-code-fences.mjs";
+import { remarkObsidianCallouts } from "./src/plugins/remark-obsidian-callouts.mjs";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { remarkWikiLinks } from "./src/plugins/remark-wiki-links.mjs";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 
 // https://astro.build/config
+const isDev = process.env.NODE_ENV !== "production";
+
 export default defineConfig({
 	site: "https://fuwari.vercel.app/",
 	base: "/",
@@ -41,7 +47,7 @@ export default defineConfig({
 			// when the Tailwind class `transition-all` is used
 			containers: ["main", "#toc"],
 			smoothScrolling: true,
-			cache: true,
+			cache: !isDev,
 			preload: true,
 			accessibility: true,
 			updateHead: true,
@@ -105,10 +111,13 @@ export default defineConfig({
 	],
 	markdown: {
 		remarkPlugins: [
+			remarkNormalizeCodeFences,
+			remarkMermaidDirective,
 			remarkMath,
 			remarkReadingTime,
 			remarkExcerpt,
 			remarkGithubAdmonitionsToDirectives,
+			remarkObsidianCallouts,
 			remarkDirective,
 			remarkSectionize,
 			remarkWikiLinks,
@@ -122,6 +131,7 @@ export default defineConfig({
 				{
 					components: {
 						github: GithubCardComponent,
+						mermaid: MermaidComponent,
 						note: (x, y) => AdmonitionComponent(x, y, "note"),
 						tip: (x, y) => AdmonitionComponent(x, y, "tip"),
 						important: (x, y) => AdmonitionComponent(x, y, "important"),
