@@ -3,13 +3,36 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCategoryUrl } from "@utils/url-utils.ts";
 
+type SortedPostOptions = {
+	includeIndex?: boolean;
+	onlyIndex?: boolean;
+};
+
+function isIndexPost(post: CollectionEntry<"posts">) {
+	return (post.data.kind ?? "").trim().toLowerCase() === "index";
+}
+
+function shouldIncludePost(post: CollectionEntry<"posts">, options: SortedPostOptions) {
+	if (options.onlyIndex) {
+		return isIndexPost(post);
+	}
+
+	if (options.includeIndex === false) {
+		return !isIndexPost(post);
+	}
+
+	return true;
+}
+
 // // Retrieve posts and sort them by publication date
-async function getRawSortedPosts() {
+async function getRawSortedPosts(options: SortedPostOptions = {}) {
 	const allBlogPosts = await getCollection("posts", ({ data }) => {
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
 
-	const sorted = allBlogPosts.sort((a, b) => {
+	const sorted = allBlogPosts
+		.filter((post) => shouldIncludePost(post, options))
+		.sort((a, b) => {
 		const dateA = new Date(a.data.published);
 		const dateB = new Date(b.data.published);
 		return dateA > dateB ? -1 : 1;
@@ -17,8 +40,8 @@ async function getRawSortedPosts() {
 	return sorted;
 }
 
-export async function getSortedPosts() {
-	const sorted = await getRawSortedPosts();
+export async function getSortedPosts(options: SortedPostOptions = {}) {
+	const sorted = await getRawSortedPosts(options);
 
 	for (let i = 1; i < sorted.length; i++) {
 		sorted[i].data.nextSlug = sorted[i - 1].slug;
@@ -35,8 +58,8 @@ export type PostForList = {
 	slug: string;
 	data: CollectionEntry<"posts">["data"];
 };
-export async function getSortedPostsList(): Promise<PostForList[]> {
-	const sortedFullPosts = await getRawSortedPosts();
+export async function getSortedPostsList(options: SortedPostOptions = {}): Promise<PostForList[]> {
+	const sortedFullPosts = await getRawSortedPosts(options);
 
 	// delete post.body
 	const sortedPostsList = sortedFullPosts.map((post) => ({
@@ -83,7 +106,9 @@ export async function getCategoryList(): Promise<Category[]> {
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
 	const count: { [key: string]: number } = {};
-	allBlogPosts.forEach((post: { data: { category: string | null } }) => {
+	allBlogPosts
+		.filter((post) => !isIndexPost(post))
+		.forEach((post: { data: { category: string | null } }) => {
 		if (!post.data.category) {
 			const ucKey = i18n(I18nKey.uncategorized);
 			count[ucKey] = count[ucKey] ? count[ucKey] + 1 : 1;
@@ -95,8 +120,8 @@ export async function getCategoryList(): Promise<Category[]> {
 				? post.data.category.trim()
 				: String(post.data.category).trim();
 
-		count[categoryName] = count[categoryName] ? count[categoryName] + 1 : 1;
-	});
+			count[categoryName] = count[categoryName] ? count[categoryName] + 1 : 1;
+		});
 
 	const lst = Object.keys(count).sort((a, b) => {
 		return a.toLowerCase().localeCompare(b.toLowerCase());
