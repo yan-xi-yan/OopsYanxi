@@ -1,4 +1,4 @@
----
+﻿---
 title: Transformer 总结与训练
 published: 2026-04-22
 description: Transformer 全链路回顾、训练策略与关键技巧
@@ -51,12 +51,12 @@ graph TD
 
 | 组件 | 作用 | 关键公式 | 详细笔记 |
 |------|------|---------|---------|
-| Token Embedding | 词 ID → 稠密向量 | $e = W_E[id]$ | [Token Embedding](../02_Input_Representation/01_Token Embedding.md) |
+| Token Embedding | 词 ID → 稠密向量 | $e = W_E[id]$ | [Token Embedding](../02_Input_Representation/01_Token_Embedding.md) |
 | 位置编码 | 注入序列顺序 | $PE = \sin/\cos$ | [位置编码](../02_Input_Representation/02_位置编码.md) |
-| Self-Attention | 序列内自我关联 | $\text{softmax}(QK^T/\sqrt{d_k})V$ | [Self Attention 计算](../03_Attention/02_Self Attention计算.md) |
+| Self-Attention | 序列内自我关联 | $\text{softmax}(QK^T/\sqrt{d_k})V$ | [Self Attention 计算](../03_Attention/02_Self_Attention计算.md) |
 | 多头注意力 | 多角度并行关注 | $\text{Concat}(\text{head}_i)W_O$ | [多头注意力](../03_Attention/03_多头注意力.md) |
-| FFN | 逐位置非线性变换 | $\text{ReLU}(xW_1)W_2$ | [Encoder Block](../04_Architecture/01_Encoder Block.md) |
-| 因果掩码 | 防止看到未来 | 下三角掩码矩阵 | [Masked Self Attention](../04_Architecture/02_Masked Self Attention.md) |
+| FFN | 逐位置非线性变换 | $\text{ReLU}(xW_1)W_2$ | [Encoder Block](../04_Architecture/01_Encoder_Block.md) |
+| 因果掩码 | 防止看到未来 | 下三角掩码矩阵 | [Masked Self Attention](../04_Architecture/02_Masked_Self_Attention.md) |
 | 输出层 | 隐藏状态 → 词概率 | $\text{softmax}(hW^T)$ | [终端输出](../04_Architecture/03_终端输出.md) |
 
 ---
@@ -212,3 +212,5 @@ graph TD
 - [什么是语言模型](../01_Foundation/01_什么是语言模型.md) — 回顾：训练的最终目标
 
 [^1]: **Exposure Bias（曝光偏差）**：训练时模型只见过真实数据，推理时却要面对自己的预测（可能有错）。这种训练/推理分布的不一致会导致错误累积。Scheduled Sampling、Minimum Risk Training 等技术试图缓解这个问题。
+
+

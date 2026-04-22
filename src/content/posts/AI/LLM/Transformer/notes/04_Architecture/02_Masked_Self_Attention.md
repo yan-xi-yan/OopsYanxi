@@ -1,4 +1,4 @@
----
+﻿---
 title: Masked Self Attention
 published: 2026-04-22
 description: 解码器中的因果掩码与交叉注意力机制详解
@@ -166,6 +166,8 @@ graph TD
 
 ## 相关笔记
 
-- [Encoder Block](./01_Encoder Block.md) — 上一篇：编码器的完整结构
+- [Encoder Block](./01_Encoder_Block.md) — 上一篇：编码器的完整结构
 - [终端输出](./03_终端输出.md) — 下一篇：解码器输出后的处理
-- [理解 Self Attention](../03_Attention/01_理解Self Attention.md) — Self-Attention 基础
+- [理解 Self Attention](../03_Attention/01_理解Self_Attention.md) — Self-Attention 基础
+
+

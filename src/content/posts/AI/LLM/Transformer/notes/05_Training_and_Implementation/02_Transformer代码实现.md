@@ -1,4 +1,4 @@
----
+﻿---
 title: Transformer 代码实现
 published: 2026-04-22
 description: 从零用 PyTorch 实现完整的 Transformer 模型
@@ -359,3 +359,4 @@ print(f"Loss: {loss.item():.4f}")
 
 - [Transformer 总结与训练](./01_Transformer总结与训练.md) — 上一篇：训练策略与技巧
 - [Transformer 整体架构](../01_Foundation/02_Transformer整体架构.md) — 回顾：架构全局图
+

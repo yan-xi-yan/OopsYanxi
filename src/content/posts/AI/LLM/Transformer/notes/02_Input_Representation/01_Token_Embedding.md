@@ -1,4 +1,4 @@
----
+﻿---
 title: Token Embedding
 published: 2026-04-22
 description: 分词策略与词嵌入矩阵：文本如何变成向量
@@ -163,3 +163,4 @@ $$\text{logits} = \mathbf{h} \cdot \mathbf{W}_E^T$$
 
 [^1]: **BPE (Byte Pair Encoding)**：最初是一种数据压缩算法，2015 年被 Sennrich 等人引入 NLP 做子词分词。核心是贪心地反复合并最高频的相邻字符对，直到词表达到目标大小。
 [^2]: **SentencePiece**：Google 开源的分词工具，直接在原始文本（包括空格）上训练，不需要预分词，因此对中文、日文等无空格分词的语言特别友好。
+

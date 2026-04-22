@@ -1,4 +1,4 @@
----
+﻿---
 title: 理解 Self Attention
 published: 2026-04-22
 description: 用直觉类比理解 Self-Attention 的核心思想与 Q/K/V 机制
@@ -92,7 +92,7 @@ graph TD
 
 ## 4. Self-Attention vs 传统注意力
 
-[ML 系列中的注意力机制](../../Machine-learning/notes/10_Attention_and_Transformer/01_编码器解码器与注意力机制.md)讲的是 **Cross-Attention**（编码器→解码器），Self-Attention 是它的特殊形式：
+[[01_编码器解码器与注意力机制|ML 系列中的注意力机制]]讲的是 **Cross-Attention**（编码器→解码器），Self-Attention 是它的特殊形式：
 
 | | Cross-Attention | Self-Attention |
 |---|---|---|
@@ -135,6 +135,8 @@ graph TD
 
 ## 相关笔记
 
-- [Self Attention 计算](./02_Self Attention计算.md) — 下一篇：数学公式与数值推导
+- [Self Attention 计算](./02_Self_Attention计算.md) — 下一篇：数学公式与数值推导
 - [多头注意力](./03_多头注意力.md) — 从单头到多头的扩展
 - [位置编码](../02_Input_Representation/02_位置编码.md) — Self-Attention 本身不含位置信息，需要位置编码补充
+
+

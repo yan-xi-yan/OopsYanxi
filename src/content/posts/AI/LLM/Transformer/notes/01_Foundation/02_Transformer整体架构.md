@@ -1,4 +1,4 @@
----
+﻿---
 title: Transformer 整体架构
 published: 2026-04-22
 description: 从全局视角拆解 Transformer 的 Encoder-Decoder 结构与数据流
@@ -65,9 +65,10 @@ graph TD
 > - **编码器**：把输入序列编码成"语义记忆"，每一层都通过自注意力让所有位置互相交流
 > - **解码器**：基于编码器的"记忆"，自回归地生成输出序列，每一步只能看到已生成的部分
 > - **N 层堆叠**：原论文使用 $N=6$，每层结构相同但参数独立
+> - **前馈网络**：由**“全连接层”**堆叠而成. 这是一条极其严格的**单向单行道**。数据从“输入层”喂进去（Feed），然后一层一层地只向着“输出层”的方向**向前传递（Forward）**
 
 ---
-
+	
 ## 3. 六大核心组件
 
 Transformer 由以下六个模块搭建而成，后续章节将逐一深入：
@@ -81,14 +82,14 @@ graph LR
     EB --> OUT["⑥ 输出层"]
 ```
 
-| # | 组件 | 作用 | 详细笔记 |
-|---|------|------|---------|
-| ① | Token Embedding | 将离散词 ID 映射为稠密向量 | [Token Embedding](../02_Input_Representation/01_Token Embedding.md) |
-| ② | 位置编码 | 注入序列顺序信息 | [位置编码](../02_Input_Representation/02_位置编码.md) |
-| ③ | Self-Attention | 计算序列中任意两个位置的关联度 | [理解 Self Attention](../03_Attention/01_理解Self Attention.md) |
-| ④ | 多头注意力 | 从多个角度并行提取特征 | [多头注意力](../03_Attention/03_多头注意力.md) |
-| ⑤ | Encoder/Decoder Block | 注意力 + FFN + 残差 + 归一化 | [Encoder Block](../04_Architecture/01_Encoder Block.md) |
-| ⑥ | 输出层 | Linear + Softmax → 词概率 | [终端输出](../04_Architecture/03_终端输出.md) |
+| #   | 组件                    | 作用                     | 详细笔记                                                                |
+| --- | --------------------- | ---------------------- | ------------------------------------------------------------------- |
+| ①   | Token Embedding       | 将离散词 ID 映射为稠密向量        | [Token Embedding](../02_Input_Representation/01_Token_Embedding.md) |
+| ②   | 位置编码                  | 注入序列顺序信息               | [位置编码](../02_Input_Representation/02_位置编码.md)                       |
+| ③   | Self-Attention        | 计算序列中任意两个位置的关联度        | [理解 Self Attention](../03_Attention/01_理解Self_Attention.md)         |
+| ④   | 多头注意力                 | 从多个角度并行提取特征            | [多头注意力](../03_Attention/03_多头注意力.md)                                |
+| ⑤   | Encoder/Decoder Block | 注意力 + FFN + 残差 + 归一化   | [Encoder Block](../04_Architecture/01_Encoder_Block.md)             |
+| ⑥   | 输出层                   | Linear + Softmax → 词概率 | [终端输出](../04_Architecture/03_终端输出.md)                               |
 
 ---
 
@@ -178,7 +179,8 @@ graph TD
 ## 相关笔记
 
 - [什么是语言模型](./01_什么是语言模型.md) — 上一篇：理解 Transformer 要解决的问题
-- [Token Embedding](../02_Input_Representation/01_Token Embedding.md) — 下一篇：输入如何进入模型
-- [浅看 Transformer 架构](../../Machine-learning/notes/10_Attention_and_Transformer/02_浅看Transformer架构.md) — ML 系列中的概览版（更简洁）
+- [Token Embedding](../02_Input_Representation/01_Token_Embedding.md) — 下一篇：输入如何进入模型
+- [[02_浅看Transformer架构]] — ML 系列中的概览版（更简洁）
 
 [^1]: **Teacher Forcing**：训练时将真实标签（而非模型自己的预测）作为解码器的输入。好处是训练稳定、收敛快；缺点是训练和推理存在分布偏移（Exposure Bias），模型推理时遇到自己的错误预测可能会"滚雪球"。
+

@@ -58,7 +58,7 @@ graph LR
 ```
 
 > [!info] 为什么残差连接如此重要？
-> 没有残差连接，6 层 Encoder 堆叠后，梯度需要穿过所有层才能回传到底层——深层网络的[梯度消失](../../Machine-learning/notes/07_Deep_Learning_Foundations/01_梯度消失问题.md)问题会非常严重。残差连接提供了一条"梯度高速公路"，让梯度可以直接跳到任意层，训练变得稳定。
+> 没有残差连接，6 层 Encoder 堆叠后，梯度需要穿过所有层才能回传到底层——深层网络的[[01_梯度消失问题|梯度消失]]问题会非常严重。残差连接提供了一条"梯度高速公路"，让梯度可以直接跳到任意层，训练变得稳定。
 
 ---
 
@@ -209,7 +209,8 @@ Layer 6: MHA₆ → Add&Norm → FFN₆ → Add&Norm
 ## 相关笔记
 
 - [多头注意力](../03_Attention/03_多头注意力.md) — Encoder Block 的核心子组件
-- [Masked Self Attention](./02_Masked Self Attention.md) — 下一篇：解码器中的因果掩码
+- [Masked Self Attention](./02_Masked_Self_Attention.md) — 下一篇：解码器中的因果掩码
 
 [^1]: **Layer Normalization**：Ba et al., 2016 年提出。与 Batch Normalization 不同，LayerNorm 对每个样本独立做归一化，不依赖 mini-batch 中的其他样本，因此天然适合变长序列和小 batch 场景。
+
 

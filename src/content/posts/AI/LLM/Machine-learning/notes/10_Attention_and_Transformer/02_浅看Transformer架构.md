@@ -1,4 +1,4 @@
----
+﻿---
 title: 浅看 Transformer 架构
 published: 2026-04-21
 description: Transformer 整体架构、多头注意力与位置编码详解
@@ -175,3 +175,4 @@ $$\text{output} = \text{LayerNorm}(x + \text{SubLayer}(x))$$
 - [梯度消失问题](../07_Deep_Learning_Foundations/01_梯度消失问题.md)
 
 [^1]: **层归一化（Layer Normalization）**：对单个样本的所有特征维度做归一化（均值为0，方差为1）。与 BatchNorm 不同，LayerNorm 不依赖 batch 内其他样本，适合序列长度可变的 NLP 任务，也适合小 batch 或在线推理场景。
+

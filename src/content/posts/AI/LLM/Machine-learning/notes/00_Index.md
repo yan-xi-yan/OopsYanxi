@@ -1,4 +1,4 @@
----
+﻿---
 title: 机器学习知识库索引
 published: 2026-04-20
 description: 机器学习核心知识点总目录
@@ -50,3 +50,4 @@ Seq2Seq 与注意力机制，Transformer 整体架构与多头注意力。
 
 ### [99 - 知识总结](./99_Summary/00_Index.md)
 全局知识图谱、速查表、训练 Checklist 与学习路径。
+

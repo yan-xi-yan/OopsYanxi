@@ -1,5 +1,6 @@
----
+﻿---
 title: 训练与实现
+published: 2026-04-22
 description: Transformer 训练策略与从零代码实现
 tags: [Transformer, 训练, 代码实现, 索引]
 ---
@@ -15,3 +16,4 @@ tags: [Transformer, 训练, 代码实现, 索引]
 
 ## 前置依赖
 - 建议完成前四章全部内容后再阅读
+

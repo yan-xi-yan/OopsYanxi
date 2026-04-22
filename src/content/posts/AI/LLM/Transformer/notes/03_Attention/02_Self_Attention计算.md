@@ -1,4 +1,4 @@
----
+﻿---
 title: Self Attention 计算
 published: 2026-04-22
 description: Scaled Dot-Product Attention 的完整数学推导、数值实例与代码实现
@@ -171,5 +171,7 @@ print(output.round(2))
 
 ## 相关笔记
 
-- [理解 Self Attention](./01_理解Self Attention.md) — 上一篇：直觉与概念
+- [理解 Self Attention](./01_理解Self_Attention.md) — 上一篇：直觉与概念
 - [多头注意力](./03_多头注意力.md) — 下一篇：从单头扩展到多头
+
+
