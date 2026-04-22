@@ -25,6 +25,25 @@ const {
 </div>
 
 <script>
+type MermaidRenderResult = {
+    svg: string;
+    bindFunctions?: (element: Element) => void;
+};
+
+type MermaidModule = {
+    initialize: (config: Record<string, unknown>) => void;
+    render: (id: string, source: string) => Promise<MermaidRenderResult>;
+};
+
+declare global {
+    interface Window {
+        __oopsYanxiMarkdownLinksBound?: boolean;
+        __oopsYanxiMermaidBound?: boolean;
+    }
+}
+
+let mermaidModulePromise: Promise<MermaidModule> | null = null;
+
 function resolveInternalMarkdownHref(
     href: string,
     sourcePath: string,
@@ -73,12 +92,82 @@ function rewriteInternalMarkdownLinks() {
     });
 }
 
-if (!(window as Window & { __oopsYanxiMarkdownLinksBound?: boolean }).__oopsYanxiMarkdownLinksBound) {
+function extractMermaidSource(pre: HTMLPreElement) {
+    const renderedLines = Array.from(
+        pre.querySelectorAll<HTMLElement>(":scope > code > .ec-line > .code"),
+    );
+
+    if (renderedLines.length > 0) {
+        return renderedLines
+            .map((line) => line.textContent ?? "")
+            .join("\n")
+            .trim();
+    }
+
+    return (pre.textContent ?? "").trim();
+}
+
+async function getMermaidRenderer() {
+    if (!mermaidModulePromise) {
+        mermaidModulePromise = import("mermaid").then((mermaidModule) => {
+            return (mermaidModule.default ?? mermaidModule) as MermaidModule;
+        });
+    }
+
+    return mermaidModulePromise;
+}
+
+async function renderMermaidDiagrams() {
+    const mermaidBlocks = Array.from(
+        document.querySelectorAll<HTMLPreElement>(".custom-md pre[data-language='mermaid']"),
+    );
+    if (mermaidBlocks.length === 0) {
+        return;
+    }
+
+    const mermaid = await getMermaidRenderer();
+    mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "loose",
+        theme: document.documentElement.classList.contains("dark") ? "dark" : "default",
+    });
+
+    for (const pre of mermaidBlocks) {
+        const source = extractMermaidSource(pre);
+        if (!source) {
+            continue;
+        }
+
+        const wrapper = pre.closest(".expressive-code") ?? pre;
+        const diagramContainer = document.createElement("div");
+        const diagramId = `mermaid-diagram-${Math.random().toString(36).slice(2)}`;
+
+        diagramContainer.className = "mermaid-diagram not-prose my-6 overflow-x-auto rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[0.03]";
+        diagramContainer.dataset.mermaidSource = source;
+
+        try {
+            const { svg, bindFunctions } = await mermaid.render(diagramId, source);
+            diagramContainer.innerHTML = svg;
+            bindFunctions?.(diagramContainer);
+            wrapper.replaceWith(diagramContainer);
+        } catch (error) {
+            console.error("Failed to render mermaid diagram", error);
+        }
+    }
+}
+
+if (!window.__oopsYanxiMarkdownLinksBound) {
     document.addEventListener("astro:page-load", rewriteInternalMarkdownLinks);
-    (window as Window & { __oopsYanxiMarkdownLinksBound?: boolean }).__oopsYanxiMarkdownLinksBound = true;
+    window.__oopsYanxiMarkdownLinksBound = true;
 }
 
 rewriteInternalMarkdownLinks();
+renderMermaidDiagrams();
+
+if (!window.__oopsYanxiMermaidBound) {
+    document.addEventListener("astro:page-load", renderMermaidDiagrams);
+    window.__oopsYanxiMermaidBound = true;
+}
 
 document.addEventListener("click", function (e: MouseEvent) {
     const target = e.target as Element | null;
