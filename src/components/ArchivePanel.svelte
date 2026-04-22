@@ -12,7 +12,8 @@
 
 	let uncategorized: string | null = null;
 	let groups: Group[] = [];
-	let filteredIndexPosts: Post[] = [];
+	let indexGroups: IndexGroup[] = [];
+	let orphanIndexPosts: Post[] = [];
 
 	interface Post {
 		slug: string;
@@ -32,6 +33,11 @@
 	interface Group {
 		year: number;
 		posts: Post[];
+	}
+
+	interface IndexGroup {
+		root: Post;
+		children: Post[];
 	}
 
 	function formatDate(date: Date) {
@@ -96,6 +102,67 @@
 		return post.data.section;
 	}
 
+	function getIndexRelativeParts(post: Post) {
+		const slugParts = post.slug.split("/");
+		const notesIndex = slugParts.indexOf("notes");
+		if (notesIndex === -1) {
+			return [];
+		}
+
+		return slugParts.slice(notesIndex + 1);
+	}
+
+	function getIndexLevel(post: Post) {
+		const relativeParts = getIndexRelativeParts(post);
+		if (relativeParts.length <= 1) {
+			return 1;
+		}
+
+		return 2;
+	}
+
+	function getIndexScope(post: Post) {
+		const slugParts = post.slug.split("/");
+		const notesIndex = slugParts.indexOf("notes");
+		if (notesIndex === -1) {
+			return post.slug;
+		}
+
+		return slugParts.slice(0, notesIndex + 1).join("/");
+	}
+
+	function getParentRootKey(post: Post) {
+		return `${getIndexScope(post)}::${post.data.category ?? ""}`;
+	}
+
+	function buildIndexGroups(posts: Post[]) {
+		const roots = posts.filter((post) => getIndexLevel(post) === 1).sort(compareIndexPosts);
+		const children = posts.filter((post) => getIndexLevel(post) > 1).sort(compareIndexPosts);
+		const grouped = new Map<string, IndexGroup>();
+		const rootLookup = new Map<string, Post>();
+
+		for (const root of roots) {
+			grouped.set(root.slug, { root, children: [] });
+			rootLookup.set(getParentRootKey(root), root);
+		}
+
+		const orphans: Post[] = [];
+		for (const child of children) {
+			const parent = rootLookup.get(getParentRootKey(child));
+			if (!parent) {
+				orphans.push(child);
+				continue;
+			}
+
+			grouped.get(parent.slug)?.children.push(child);
+		}
+
+		return {
+			groups: roots.map((root) => grouped.get(root.slug) ?? { root, children: [] }),
+			orphans,
+		};
+	}
+
 	onMount(() => {
 		const params = new URLSearchParams(window.location.search);
 		tags = params.has("tag") ? params.getAll("tag") : [];
@@ -123,7 +190,11 @@
 			matchedIndexPosts = [];
 		}
 
-		filteredIndexPosts = matchedIndexPosts.slice().sort(compareIndexPosts);
+		const { groups: builtIndexGroups, orphans } = buildIndexGroups(
+			matchedIndexPosts.slice().sort(compareIndexPosts),
+		);
+		indexGroups = builtIndexGroups;
+		orphanIndexPosts = orphans;
 
 		const grouped = filteredPosts.reduce<Record<number, Post[]>>((acc, post) => {
 			const year = post.data.published.getFullYear();
@@ -144,44 +215,93 @@
 </script>
 
 <div class="card-base px-8 py-6">
-	{#if filteredIndexPosts.length > 0}
+	{#if indexGroups.length > 0 || orphanIndexPosts.length > 0}
 		<section class="mb-8">
 			<div class="mb-4 flex items-end justify-between gap-4">
 				<div>
 					<div class="text-xs uppercase tracking-[0.2em] text-50">Index</div>
-					<div class="text-xl font-bold text-90">索引文档</div>
+					<div class="text-xl font-bold text-90">Knowledge Structure</div>
 				</div>
-				<div class="text-sm text-50">{filteredIndexPosts.length}</div>
+				<div class="text-sm text-50">{indexGroups.length + orphanIndexPosts.length}</div>
 			</div>
 
-			<div class="grid gap-4 md:grid-cols-2">
-				{#each filteredIndexPosts as post}
-					<a
-						href={getPostUrlBySlug(post.slug)}
-						aria-label={post.data.title}
-						class="group block rounded-2xl border border-black/10 bg-[var(--btn-regular-bg)] p-5 transition hover:bg-[var(--btn-regular-bg-hover)] active:scale-[0.99] dark:border-white/10"
-					>
-						<div class="mb-2 text-xs uppercase tracking-[0.16em] text-50">
-							{getIndexMeta(post) || "Knowledge Base"}
-						</div>
-						<div class="flex items-start justify-between gap-4">
-							<div class="min-w-0">
-								<div class="truncate text-lg font-bold text-90 transition group-hover:text-[var(--primary)]">
-									{post.data.title}
+			<div class="space-y-5">
+				{#each indexGroups as indexGroup}
+					<div class="rounded-[1.5rem] border border-black/10 bg-[var(--btn-regular-bg)] p-5 dark:border-white/10">
+						<div class="mb-4 flex items-start justify-between gap-4">
+							<a
+								href={getPostUrlBySlug(indexGroup.root.slug)}
+								aria-label={indexGroup.root.data.title}
+								class="group min-w-0"
+							>
+								<div class="mb-2 text-xs uppercase tracking-[0.16em] text-50">
+									{getIndexMeta(indexGroup.root) || "Knowledge Base"}
 								</div>
-								{#if getIndexSection(post)}
-									<div class="mt-1 text-sm text-50">{getIndexSection(post)}</div>
+								<div class="truncate text-xl font-bold text-90 transition group-hover:text-[var(--primary)]">
+									{indexGroup.root.data.title}
+								</div>
+								{#if indexGroup.root.data.description}
+									<div class="mt-2 line-clamp-2 text-sm text-75">{indexGroup.root.data.description}</div>
 								{/if}
-							</div>
-							<div class="rounded-lg bg-[var(--card-bg)] px-2 py-1 text-xs font-semibold text-50">
-								{String(post.data.order ?? 0).padStart(2, "0")}
+							</a>
+							<div class="shrink-0 rounded-lg bg-[var(--card-bg)] px-2 py-1 text-xs font-semibold text-50">
+								{indexGroup.children.length} sections
 							</div>
 						</div>
-						{#if post.data.description}
-							<div class="mt-3 line-clamp-2 text-sm text-75">{post.data.description}</div>
+
+						{#if indexGroup.children.length > 0}
+							<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+								{#each indexGroup.children as child}
+									<a
+										href={getPostUrlBySlug(child.slug)}
+										aria-label={child.data.title}
+										class="group block rounded-2xl bg-[var(--card-bg)] px-4 py-3 transition hover:bg-[var(--btn-regular-bg-hover)] active:scale-[0.99]"
+									>
+										<div class="mb-2 flex items-center justify-between gap-3">
+											<div class="truncate text-sm font-semibold text-90 transition group-hover:text-[var(--primary)]">
+												{child.data.title}
+											</div>
+											<div class="rounded-md bg-[var(--btn-regular-bg)] px-2 py-0.5 text-[11px] font-semibold text-50">
+												{String(child.data.order ?? 0).padStart(2, "0")}
+											</div>
+										</div>
+										{#if getIndexSection(child)}
+											<div class="mb-1 text-xs text-50">{getIndexSection(child)}</div>
+										{/if}
+										{#if child.data.description}
+											<div class="line-clamp-2 text-sm text-75">{child.data.description}</div>
+										{/if}
+									</a>
+								{/each}
+							</div>
 						{/if}
-					</a>
+					</div>
 				{/each}
+
+				{#if orphanIndexPosts.length > 0}
+					<div class="rounded-[1.5rem] border border-dashed border-black/10 bg-[var(--btn-regular-bg)] p-5 dark:border-white/10">
+						<div class="mb-3 text-sm font-semibold text-75">Standalone Section Indexes</div>
+						<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+							{#each orphanIndexPosts as post}
+								<a
+									href={getPostUrlBySlug(post.slug)}
+									aria-label={post.data.title}
+									class="group block rounded-2xl bg-[var(--card-bg)] px-4 py-3 transition hover:bg-[var(--btn-regular-bg-hover)] active:scale-[0.99]"
+								>
+									<div class="mb-2 text-xs uppercase tracking-[0.16em] text-50">
+										{getIndexMeta(post) || "Knowledge Base"}
+									</div>
+									<div class="truncate text-sm font-semibold text-90 transition group-hover:text-[var(--primary)]">
+										{post.data.title}
+									</div>
+									{#if post.data.description}
+										<div class="mt-2 line-clamp-2 text-sm text-75">{post.data.description}</div>
+									{/if}
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/if}
 			</div>
 		</section>
 	{/if}
