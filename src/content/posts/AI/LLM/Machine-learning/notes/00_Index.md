@@ -1,4 +1,4 @@
-﻿---
+---
 title: 机器学习知识库索引
 published: 2026-04-20
 description: 机器学习核心知识点总目录
@@ -9,51 +9,44 @@ tags:
 category: Machine Learning
 draft: false
 ---
-	
+
 # 机器学习知识库
 
-## 目录结构
+## 机器学习篇
 
-### 01 - 概览
-- [机器学习与深度学习概览](./01_Overview/01_机器学习与深度学习概览.md)
+### [01 - 概览](./01_Overview/00_Index.md)
+AI、机器学习与深度学习的关系，有监督/无监督/强化学习分类。
 
-### 02 - 有监督学习
-- [有监督学习：回归与分类](./02_Supervised_Learning/01_有监督学习_回归与分类.md)
-- [多元线性回归算法](./02_Supervised_Learning/02_多元线性回归算法.md)
-- [逻辑回归与 Softmax 回归](./02_Supervised_Learning/03_逻辑回归与Softmax回归.md)
+### [02 - 有监督学习](./02_Supervised_Learning/00_Index.md)
+回归与分类两大核心任务，线性回归、逻辑回归、Softmax 回归及其损失函数。
 
-### 03 - 训练与优化
-- [梯度下降法与模型训练](./03_Training_and_Optimization/01_梯度下降法与模型训练.md)
-- [ML 训练流水线与算法流派](./03_Training_and_Optimization/02_ML训练流水线与算法流派.md)
+### [03 - 训练与优化](./03_Training_and_Optimization/00_Index.md)
+梯度下降法（BGD/SGD/Mini-batch）、学习率策略、完整训练流水线。
 
-### 04 - 特征工程
-- [升维、降维、惩罚项与 Early Stopping](./04_Feature_Engineering/01_升维降维与Early_Stopping.md)
+### [04 - 特征工程](./04_Feature_Engineering/00_Index.md)
+多项式升维、PCA 降维，欠拟合与过拟合的概念。
 
-### 05 - 正则化与泛化
-- [正则化与归一化](./05_Regularization_and_Generalization/01_正则化与归一化.md)
+### [05 - 正则化](./05_Regularization/00_Index.md)
+L1/L2 正则化、惩罚项、Early Stopping、特征缩放（Min-Max / Z-Score）。
 
-### 06 - 神经网络
-- [什么是神经网络](./06_Neural_Network/01_什么是神经网络.md)
-- [神经网络反向传播](./06_Neural_Network/02_神经网络反向传播.md)
+### [06 - 神经网络](./06_Neural_Network/00_Index.md)
+人工神经元、网络结构、前向传播与反向传播。
 
-### 07 - 总结
-- [机器学习知识总结](./07_Summary/01_知识总结.md)
+## 深度学习篇
 
-### 08 - 深度学习基础
-- [梯度消失问题](./08_Deep_Learning_Foundations/01_梯度消失问题.md)
-- [激活函数、批量归一化与参数初始化](./08_Deep_Learning_Foundations/02_激活函数_批量归一化与参数初始化.md)
+### [07 - 深度学习基础](./07_Deep_Learning_Foundations/00_Index.md)
+梯度消失问题，激活函数选择（ReLU/GELU/Swish），BatchNorm 与参数初始化。
 
-### 09 - CNN 与计算机视觉
-- [图像识别与卷积神经网络](./09_CNN_and_Computer_Vision/01_图像识别与卷积神经网络.md)
-- [经典 CNN 模型与残差网络](./09_CNN_and_Computer_Vision/02_经典CNN模型与残差网络.md)
-- [CNN 完整过程实例解析](./09_CNN_and_Computer_Vision/03_CNN完整过程实例解析.md)
+### [08 - 卷积神经网络](./08_CNN/00_Index.md)
+卷积操作原理，LeNet → ResNet 模型演进，手写数字识别实例。
 
-### 10 - 序列模型与 NLP
-- [NLP任务与循环神经网络](./10_Sequence_Models_and_NLP/01_NLP任务与循环神经网络.md)
-- [梯度消失与长短时记忆网络](./10_Sequence_Models_and_NLP/02_梯度消失与长短时记忆网络.md)
-- [RNN 完整过程实例解析](./10_Sequence_Models_and_NLP/03_RNN完整过程实例解析.md)
-- [LSTM 门控机制实例解析](./10_Sequence_Models_and_NLP/04_LSTM门控机制实例解析.md)
+### [09 - 序列模型](./09_Sequence_Models/00_Index.md)
+RNN 结构与时间展开，LSTM 门控机制，情感分析实例。
 
-### 11 - 注意力与 Transformer
-- [编码器解码器与注意力机制](./11_Attention_and_Transformer/01_编码器解码器与注意力机制.md)
-- [浅看 Transformer 架构](./11_Attention_and_Transformer/02_浅看Transformer架构.md)
+### [10 - 注意力与 Transformer](./10_Attention_and_Transformer/00_Index.md)
+Seq2Seq 与注意力机制，Transformer 整体架构与多头注意力。
+
+---
+
+### [99 - 知识总结](./99_Summary/00_Index.md)
+全局知识图谱、速查表、训练 Checklist 与学习路径。
