@@ -8,7 +8,12 @@ interface Props {
 	headings: MarkdownHeading[];
 }
 
-let { headings = [] } = Astro.props;
+type VisibleHeading = MarkdownHeading & {
+	level: number;
+	rootIndex: number | null;
+};
+
+let { headings = [] }: Props = Astro.props;
 
 let minDepth = 10;
 for (const heading of headings) {
@@ -30,32 +35,64 @@ const removeTailingHash = (text: string) => {
 let heading1Count = 1;
 
 const maxLevel = siteConfig.toc.depth;
+const maxDepth = Number.isFinite(maxLevel) && maxLevel > 0 ? minDepth + maxLevel - 1 : Number.POSITIVE_INFINITY;
+
+const visibleHeadings: VisibleHeading[] = headings
+	.filter((heading: MarkdownHeading) => heading.depth >= minDepth && heading.depth <= maxDepth)
+	.map((heading: MarkdownHeading) => ({
+		...heading,
+		level: heading.depth - minDepth,
+		rootIndex: heading.depth === minDepth ? heading1Count++ : null,
+	}));
+
+const getIndentStyle = (level: number) => `margin-left: ${level}rem;`;
+
+const getBadgeSizeRem = (level: number) => {
+	return Math.max(0.375, 0.5 - level * 0.04);
+};
+
+const getBadgeOpacity = (level: number) => {
+	return Math.max(0.35, 0.85 - level * 0.1);
+};
+
+const getTextOpacity = (level: number) => {
+	return Math.max(0.4, 0.9 - level * 0.12);
+};
+
+const getBadgeStyle = (level: number) =>
+	`width: ${getBadgeSizeRem(level)}rem; height: ${getBadgeSizeRem(level)}rem; opacity: ${getBadgeOpacity(level)};`;
+
+const getTextStyle = (level: number) => `opacity: ${getTextOpacity(level)};`;
 ---
 {isPostsRoute &&
 <table-of-contents class:list={[className, "group"]}>
-    {headings.filter((heading) => heading.depth < minDepth + maxLevel).map((heading) =>
+    {visibleHeadings.map((heading) =>
             <a href={`#${heading.slug}`} class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
         hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
     ">
-                <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold",
-                    {
-                        "bg-[var(--toc-badge-bg)] text-[var(--btn-content)]": heading.depth == minDepth,
-                        "ml-4": heading.depth == minDepth + 1,
-                        "ml-8": heading.depth == minDepth + 2,
-                    }
-                ]}
+                <div
+                    class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold",
+                        {
+                            "bg-[var(--toc-badge-bg)] text-[var(--btn-content)]": heading.level === 0,
+                        }
+                    ]}
+                    style={getIndentStyle(heading.level)}
                 >
-                    {heading.depth == minDepth && heading1Count++}
-                    {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
-                    {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
+                    {heading.level === 0 && heading.rootIndex}
+                    {heading.level > 0 &&
+                        <div
+                            class="transition rounded-sm bg-[var(--toc-badge-bg)]"
+                            style={getBadgeStyle(heading.level)}
+                        ></div>
+                    }
                 </div>
-                <div class:list={["transition text-sm", {
-                    "text-50": heading.depth == minDepth || heading.depth == minDepth + 1,
-                    "text-30": heading.depth == minDepth + 2,
-                }]}>{removeTailingHash(heading.text)}</div>
+                <div
+                    class="transition text-sm"
+                    style={getTextStyle(heading.level)}
+                >{removeTailingHash(heading.text)}</div>
             </a>
     )}
-    <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all " +
+    <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': visibleHeadings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all " +
         "group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"]}></div>
 </table-of-contents>}
 

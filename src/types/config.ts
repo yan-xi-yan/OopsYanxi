@@ -32,7 +32,7 @@ export type SiteConfig = {
 	};
 	toc: {
 		enable: boolean;
-		depth: 1 | 2 | 3;
+		depth: number;
 	};
 
 	favicon: Favicon[];
