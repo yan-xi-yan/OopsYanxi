@@ -1,7 +1,10 @@
 import { visit } from "unist-util-visit";
 
 const LANGUAGE_ALIASES = {
+	dotenv: "bash",
+	env: "bash",
 	git: "bash",
+	gitignore: "txt",
 	py: "python",
 	sh: "bash",
 	shell: "bash",

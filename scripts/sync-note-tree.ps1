@@ -162,6 +162,10 @@ function Get-IndexMetadata {
         $series = "Docker & K8s"
         $category = "Docker & K8s"
     }
+    elseif ($rootFullPath -match '(?i)\\LangChain\\notes$') {
+        $series = "LangChain"
+        $category = "LangChain"
+    }
 
     return [ordered]@{
         category = $category
